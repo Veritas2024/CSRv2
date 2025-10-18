@@ -4,7 +4,7 @@
 We use `get_embeddings_of_each_dataset.py` to generate embeddings for each dataset. 
 
 The required parameters are:
-- `--model_name`: Backbone for getting embeddings. It needs to be loadable by (sentence_transformers)[https://github.com/UKPLab/sentence-transformers].
+- `--model_name`: Backbone for getting embeddings. It needs to be loadable by [sentence_transformers](https://github.com/UKPLab/sentence-transformers).
 - `--batch_size`: Batch size for embedding generation. 
 - `--save_root_path`: Path to the `npz` file that stores embeddings (and their labels).
 - `--dataset_name`: The MTEB dataset to process.

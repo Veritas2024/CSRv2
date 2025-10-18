@@ -1,6 +1,6 @@
 <div align="center">
 
-<h2>CSRv2: Unlocking {Ultra-Sparse} Embeddings</h2>
+<h2>CSRv2: Unlocking Ultra-Sparse Embeddings</h2>
 </div>
 
 <br>
@@ -8,8 +8,8 @@
 	Lixuan Guo*</a><sup>1,2</sup>,</span>
 	<a href="https://yifeiwang77.com/" target="_blank">Yifei Wang*</a><sup>3</sup>,</span>
 	<a href="https://neilwen987.github.io/" target="_blank">Tiansheng Wen*</a><sup>1,2</sup>,</span> 
-	<a href="https://yfwang.me/" target="_blank">Yifan Wang<sup>2</sup>,</span>
-	Aosong Feng<sup>4</sup>,</span>
+	<a href="https://yfwang.me/" target="_blank">Yifan Wang</a><sup>2</sup>,</span>
+    Aosong Feng<sup>4</sup>,</span>
 	<a href="https://web.xidian.edu.cn/bchen/en/index.html" target="_blank">Bo Chen</a><sup>1</sup>,</span>
 	<a href="https://people.csail.mit.edu/stefje/" target="_blank">Stefanie Jegelka</a><sup>3</sup>,</span>
 	<a href="https://chenyuyou.me/" target="_blank">Chenyu You</a><sup>2</sup> &ensp;
@@ -22,3 +22,139 @@
     <sup>4</sup>Yale University&emsp;
     <br>
 </div>
+
+<div align='center'>
+![Overview](./overview.png)
+</div>
+
+## &#x1F680; &#x1F680; News
+- 2025.10 Code released! Let's explore ultra sparsity together!
+
+In this repo, we will release (**updating**):
+
+- Environment Dependencies 
+- Experiment Codes
+    - Text Exp on [e5-mistral-7b-instruct](https://huggingface.co/intfloat/e5-mistral-7b-instruct) and [Qwen3-Embedding-4B](https://huggingface.co/Qwen/Qwen3-Embedding-4B).
+    - Image Exp on Imagenet-1K.
+- Checkpoints
+
+## Set up
+An empty conda environment with Python >= 3.11 is required and install packages according to `requirements.txt`.
+
+```shell
+conda create --name csr-v2 python=3.11.13
+conda activate csr-v2
+pip install -r requirements.txt
+```
+
+You can also migrate `conda` environment directly with the `environment.yml`.
+
+```shell
+conda env create -f environment.yml
+```
+
+## Text Embedding
+### Data preparation
+You need to prepare data for CSRv2 training, backbone finetuning and MRL training for e5-mistral-7b-instruct.
+
+For CSRv2 training data, you need to execute `get_embeddings_of_each_dataset.py` and `get_embeddings_for_training.py`.
+
+```shell
+python get_embeddings_of_each_dataset.py \
+    --task_type $TASK_TYPE \
+    --model_name $NAME_OF_BACKBONE \
+    --batch_size 2 \
+    --save_root_path /PATH/TO/SAVE/ROOT/PATH \
+    --dataset_name $NAME_OF_DATASET \
+    --gpu 0
+
+python get_embeddings_for_training.py \
+    --save_root_path /PATH/TO/SAVE/ROOT/PATH \
+    --task_type $TASK_TYPE \
+    --embedding_path /PATH/TO/SINGLE/TASK/EMBEDDING 
+```
+
+For finetuning and MRL training, you need to execute
+`get_dataset_for_finetuning.py`, `combine_datasets_in_mteb_based_on_task_type.py` and `combine_datasets_in_sentence_transformers.py`.
+
+```shell
+python get_dataset_for_finetuning.py \
+    --task_type $TASK_TYPE \
+    --save_root /PATH/TO/DATASET \
+    --max_samples_per_dataset 20000
+python combine_datasets_in_mteb_based_on_task_type.py \
+    --task_type $TASK_TYPE \
+    --max_rows_per_dataset 20000 \
+    --mteb_dataset_path /PATH/TO/DATASET
+python combine_datasets_in_sentence_transformers.py \
+    --max_pairs_per_dataset 20000 
+```
+
+Detailed instructions are available in [data preparation instructions](/docs/data_preparation.md).
+
+### CSRv2 Training & Evaluation
+We have built complete training and evaluation pipeline and you can train and get evaluation results with only one command. We offer two pipelines with different ways for evaluation, with one evaluated with [MTEB library](https://github.com/embeddings-benchmark/mteb) and the other takes our self-built evaluation procedure to avoid unnecessary repetitive backbone embedding inference.
+
+```shell
+python all_step_pipeline_mteb_evaluation.py \
+    --epochs 10 \
+    --eval_tasks $TASKS_TO_EVALUATE \
+    --base_model e5-mistral-7b-instruct \
+    --gpu 0 \
+    --embed_dim 4096 \
+    --hidden_size 16384 \
+    --topk 32 \
+    --auxk 1024 \
+    --auxk_coef 0.1 \
+    --lr 0.0001 \
+    --model_suffix $MODEL_SUFFIX \
+    --training_embedding_path /PATH/TO/EMBEDDING/FOR/TRAINING \
+    --packaged_model_dir /PATH/TO/PACKAGED/BACKBONE \
+    --use_label_CL \
+    --initial_topk 64 
+```
+
+```shell
+python all_step_pipeline_personalized_evaluation.py \
+    --epochs 10 \
+    --eval_tasks $TASKS_TO_EVALUATE \
+    --base_model e5-mistral-7b-instruct \
+    --gpu 0 \
+    --embed_dim 4096 \
+    --hidden_size 16384 \
+    --topk 32 \
+    --auxk 1024 \
+    --auxk_coef 0.1 \
+    --lr 0.0001 \
+    --eval_embedding_path /PATH/TO/EMBEDDING/FOR/EVALUATION \
+    --model_suffix $MODEL_SUFFIX \
+    --training_embedding_path /PATH/TO/EMBEDDING/FOR/TRAINING
+```
+
+Detailed instructions are available in [training instructions](/docs/training.md) and [evaluation instructions](/docs/evaluation.md).
+
+### Finetuning
+The complete version of CSRv2 requires backbone finetuning, which can be done with `topk_lora_finetuning.py`.
+```shell
+CUDA_VISIBLE_DEVICES=0,1
+torchrun --nproc_per_node=2 --master_port=31233 topk_lora_finetuning.py \
+    --dataset /PATH/TO/DATASET \
+    --model_name intfloat/e5-mistral-7b-instruct \
+    --loss "multiple_negatives_ranking_loss" \
+    --dataset_suffix $SUFFIX \
+    --gpu 0,1 \
+    --batch_size 4 \
+    --gradient_accumulation_steps 32 \
+    --topk_k_list "16,32,64,128,256,512,1024,2048,2560" \
+    --topk_weights "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0" \
+    --max_seq_length 512 \
+    --lora_r 8 \
+    --lora_alpha 16 \
+    --lr 1e-5 \
+    --topk_mode "magnitude" \
+    --apply_topk_to_backbone \
+    --load_from_disk \
+    --save_steps 100
+```
+Detailed instructions are available in [training instructions](/docs/training.md).
+
