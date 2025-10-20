@@ -54,6 +54,47 @@ conda env create -f environment.yml
 ```
 
 ## Text Embedding
+### Inference with Hugging Face 🤗 [Sentence Transformer](https://www.sbert.net/)
+In Sentence Transformers [v5.0.0](https://github.com/UKPLab/sentence-transformers/releases/v5.0.0) release, a new module called SparseEncoder is added, which supports the loading of CSR/CSRv2 models. Our checkpoints will be released in [Y-Research-Group](https://huggingface.co/Y-Research-Group), which can easily be loaded with only a few lines of codes and evaluate on your own datasets.
+
+Demo for generating embeddings based on a CSRv2/CSR model:
+
+```python
+from sentence_transformers import SparseEncoder
+model = SparseEncoder("/MODEL/NAME")
+sentences = [
+    "The weather is lovely today.",
+    "It's so sunny outside!",
+    "He drove to the stadium.",
+]
+embeddings = model.encode(sentences)
+print(embeddings.shape)
+similarities = model.similarity(embeddings, embeddings)
+print(similarities)
+```
+
+Demo for evaluating a pretrained CSRv2/CSR model on MTEB benchmark datasets.
+```python
+import mteb
+from sentence_transformers import SparseEncoder
+model = SparseEncoder(
+    "/MODEL/NAME",
+    tokenizer_kwargs={"padding_side": "left"},
+)
+model.prompts = {
+    "TASK_NAME": "PROMPT",
+}
+task_list = mteb.get_task("TASK_NAME")
+evaluation = mteb.MTEB(tasks=task_list)
+evaluation.run(
+    model,
+    eval_splits=["test"],
+    output_folder="EVAL_RESULT_PATH",
+    show_progress_bar=True,
+    encode_kwargs={"convert_to_sparse_tensor": False, "batch_size": 2}
+)
+```
+
 ### Data preparation
 You need to prepare data for CSRv2 training, backbone finetuning and MRL training for e5-mistral-7b-instruct.
 
