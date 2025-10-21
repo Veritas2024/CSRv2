@@ -24,7 +24,7 @@
 </div>
 
 <p align='center'>
-![Overview](./overview.png)
+![Overview](./assets/overview.png)
 </p>
 
 ## &#x1F680; &#x1F680; News
@@ -35,8 +35,15 @@ In this repo, we will release (**updating**):
 - Environment Dependencies 
 - Experiment Codes
     - Text Exp on [e5-mistral-7b-instruct](https://huggingface.co/intfloat/e5-mistral-7b-instruct) and [Qwen3-Embedding-4B](https://huggingface.co/Qwen/Qwen3-Embedding-4B).
+        - Inference
+        - Data preparation & training. 
     - Image Exp on Imagenet-1K.
+        - Inference
+        - Data preparation & training.
+    - Splade Exp.
 - Checkpoints
+    - Text Exp 
+    - Image Exp
 
 ## Set up
 An empty conda environment with Python >= 3.11 is required and install packages according to `requirements.txt`.
