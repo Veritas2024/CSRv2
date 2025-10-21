@@ -24,7 +24,7 @@
 </div>
 
 <p align='center'>
-![Overview](./assets/overview.png)
+![Overview](./assets/overview.jpg)
 </p>
 
 ## &#x1F680; &#x1F680; News
