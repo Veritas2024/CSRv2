@@ -103,7 +103,7 @@ evaluation.run(
 ```
 
 ### Data preparation
-You need to prepare data for CSRv2 training, backbone finetuning and MRL training for e5-mistral-7b-instruct.
+You need to prepare data for CSRv2 training, backbone finetuning and MRL training for e5-mistral-7b-instruct. Detailed instructions are available in [data preparation instructions](/docs/data_preparation.md).
 
 For CSRv2 training data, you need to execute `get_embeddings_of_each_dataset.py` and `get_embeddings_for_training.py`.
 
@@ -138,10 +138,8 @@ python combine_datasets_in_sentence_transformers.py \
     --max_pairs_per_dataset 20000 
 ```
 
-Detailed instructions are available in [data preparation instructions](/docs/data_preparation.md).
-
-### CSRv2 Training & Evaluation
-We have built complete training and evaluation pipeline and you can train and get evaluation results with only one command. We offer two pipelines with different ways for evaluation, with one evaluated with [MTEB library](https://github.com/embeddings-benchmark/mteb) and the other takes our self-built evaluation procedure to avoid unnecessary repetitive backbone embedding inference.
+### CSRv2/CSR Training & Evaluation
+We have built complete training and evaluation pipeline and you can train and get evaluation results with only one command. We offer two pipelines with different ways for evaluation, with one evaluated with [MTEB library](https://github.com/embeddings-benchmark/mteb) and the other takes our self-built evaluation procedure to avoid unnecessary repetitive backbone embedding inference. Detailed instructions are available in [training instructions](/docs/training.md) and [evaluation instructions](/docs/evaluation.md).
 
 ```shell
 python all_step_pipeline_mteb_evaluation.py \
@@ -179,10 +177,9 @@ python all_step_pipeline_personalized_evaluation.py \
     --training_embedding_path /PATH/TO/EMBEDDING/FOR/TRAINING
 ```
 
-Detailed instructions are available in [training instructions](/docs/training.md) and [evaluation instructions](/docs/evaluation.md).
-
 ### Finetuning
-The complete version of CSRv2 requires backbone finetuning, which can be done with `topk_lora_finetuning.py`.
+The complete version of CSRv2 requires backbone finetuning, which can be done with `topk_lora_finetuning.py`. Detailed instructions are available in [training instructions](/docs/training.md).
+
 ```shell
 CUDA_VISIBLE_DEVICES=0,1
 torchrun --nproc_per_node=2 --master_port=31233 topk_lora_finetuning.py \
@@ -204,5 +201,3 @@ torchrun --nproc_per_node=2 --master_port=31233 topk_lora_finetuning.py \
     --load_from_disk \
     --save_steps 100
 ```
-Detailed instructions are available in [training instructions](/docs/training.md).
-
