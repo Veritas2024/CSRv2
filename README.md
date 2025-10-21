@@ -23,9 +23,9 @@
     <br>
 </div>
 
-<p align='center'>
+<div align='center'>
 ![Overview](./assets/overview.jpg)
-</p>
+</div>
 
 ## &#x1F680; &#x1F680; News
 - 2025.10 Code released! Let's explore ultra sparsity together!
