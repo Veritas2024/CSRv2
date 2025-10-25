@@ -28,8 +28,6 @@
     <img src="./assets/overview.jpg" width="600">
 </div>
 
-This repo is the official repo for CSRv2. Please refer to [Lixuan Guo's repository](https://github.com/Veritas2024/CSRv2) for more details.
-
 ## &#x1F680; &#x1F680; News
 - 2025.10 Code released! Let's explore ultra sparsity together!
 
