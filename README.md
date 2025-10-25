@@ -11,7 +11,7 @@
 	<a href="https://yfwang.me/" target="_blank">Yifan Wang</a><sup>1</sup>,</span>
     Aosong Feng<sup>4</sup>,</span>
 	<a href="https://web.xidian.edu.cn/bchen/en/index.html" target="_blank">Bo Chen</a><sup>2</sup>,</span>
-	<a href="https://people.csail.mit.edu/stefje/" target="_blank">Stefanie Jegelka</a><sup>3</sup>,</span>
+	<a href="https://people.csail.mit.edu/stefje/" target="_blank">Stefanie Jegelka</a><sup>5,3</sup>,</span>
 	<a href="https://chenyuyou.me/" target="_blank">Chenyu You</a><sup>1</sup> &ensp;
 </div>
 <br>
@@ -20,12 +20,15 @@
     <sup>2</sup>Xidian University&emsp;    
     <sup>3</sup>MIT&emsp;
     <sup>4</sup>Yale University&emsp;
+    <sup>5</sup>TUM
     <br>
 </div>
 
 <div align='center'>
     <img src="./assets/overview.jpg" width="600">
 </div>
+
+This repo is the official repo for CSRv2. Please refer to [Lixuan Guo's repository](https://github.com/Veritas2024/CSRv2) for more details.
 
 ## &#x1F680; &#x1F680; News
 - 2025.10 Code released! Let's explore ultra sparsity together!
