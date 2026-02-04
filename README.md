@@ -46,6 +46,7 @@ In this repo, we will release (**updating**):
         - Inference
         - Data preparation & training.
     - Splade Exp.
+    - GraphRAG Exp.
 - Checkpoints
     - Text Exp 
     - Image Exp
@@ -205,4 +206,34 @@ torchrun --nproc_per_node=2 --master_port=31233 topk_lora_finetuning.py \
     --apply_topk_to_backbone \
     --load_from_disk \
     --save_steps 100
+```
+
+### GraphRAG evaluation
+We evaluate further on [GraphRAG-Bench](https://arxiv.org/abs/2506.05690) with [Fast GraphRAG](https://github.com/HKUDS/LightRAG) framework. Detailed instructions can be found in [GraphRAG evaluation instruction](/docs/GraphRAG_evaluation.md).
+
+```shell
+python run_fast-graphrag.py \
+  --subset medical \
+  --base_dir $WORKSPACE_DIR \
+  --model_name gpt-4o-mini \
+  --embed_model_path $EMBEDDING_MODEL_PATH \
+  --llm_base_url $LLM_BASE_URL
+
+CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node=1 --master_port=29500 -m Evaluation.retrieval_eval \
+  --mode API \
+  --model gpt-4o-mini \
+  --base_url $LLM_BASE_URL \
+  --embedding_model $EMBEDDING_MODEL_PATH \
+  --data_file $PATH_TO_PREDICTIONS \
+  --output_file $PATH_TO_RESULT \
+  --detailed_output
+
+CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node=1 --master_port=29600 -m Evaluation.generation_eval \
+  --mode API \
+  --model gpt-4o-mini \
+  --base_url $LLM_BASE_URL \
+  --embedding_model $EMBEDDING_MODEL_PATH \
+  --data_file $PATH_TO_PREDICTIONS \
+  --output_file $PATH_TO_RESULT \
+  --detailed_output
 ```
