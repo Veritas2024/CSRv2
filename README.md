@@ -237,3 +237,21 @@ CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node=1 --master_port=29600 -m Evalua
   --output_file $PATH_TO_RESULT \
   --detailed_output
 ```
+
+## Image Embedding
+### Data preparation
+
+## Citing this paper
+If you find this work useful, please cite the accompanying paper:
+
+```shell
+@inproceedings{guo2026csrv2,
+    title={{CSR}v2: Unlocking Ultra-sparse Embeddings},
+    author={Guo, Lixuan and Wang, Yifei and Wen, Tiansheng and Wang, Yifan and Feng, Aosong and Chen, Bo and Jegelka, Stefanie and You, Chenyu},
+    booktitle={International Conference on Learning Representations (ICLR)},
+    year={2026}
+}
+```
+
+## Acknowledgements
+This repository was built off of [CSR](https://github.com/neilwen987/CSR_Adaptive_Rep) and [GraphRAG-Benchmark](https://github.com/GraphRAG-Bench/GraphRAG-Benchmark). Thank you for their amazing works!
