@@ -8,9 +8,9 @@
 
 <p style="font-family: Charter, serif; font-size: 15px; line-height: 1.6; color: #444;">
 <b>
-Lixuan Guo*</b><sup>1,2</sup>,
-<a href="https://yifeiwang77.com/" target="_blank"><b>Yifei Wang*</b></a><sup>3</sup>,
-<a href="https://neilwen987.github.io/" target="_blank"><b>Tiansheng Wen*</b></a><sup>1,2</sup>,
+<a href="https://veritas2024.github.io/" target="_blank"> Lixuan Guo</b><sup>*1,2</sup>,
+<a href="https://yifeiwang77.com/" target="_blank"><b>Yifei Wang</b></a><sup>*3</sup>,
+<a href="https://neilwen987.github.io/" target="_blank"><b>Tiansheng Wen</b></a><sup>*1,2</sup>,
 <a href="https://yfwang.me/" target="_blank"><b>Yifan Wang</b></a><sup>1</sup>,
 <a href="https://scholar.google.com/citations?user=hFhhrmgAAAAJ&hl=en"><b>Aosong Feng</b></a><sup>4</sup>,</br>
 <a href="https://web.xidian.edu.cn/bchen/en/index.html" target="_blank"><b>Bo Chen</b></a><sup>2</sup>,
@@ -240,6 +240,65 @@ CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node=1 --master_port=29600 -m Evalua
 
 ## Image Embedding
 ### Data preparation
+You need to download Imagenet1k and follow the pipeline of [FFCV](https://github.com/libffcv/ffcv-imagenet) to generate the dataset. Details are available in [data preparation instructions](/docs/data_preparation.md).
+
+```shell
+python ./dataset_preparation annotations.py --xml_dir "/path/to/train/annotation/directory" --output_file "/path/to/annotation.txt/directory"
+python ./dataset_preparation to_pytorch_style.py --split_path "/path/to/pytorch/style/dataset"
+
+cd dataset_preparation
+export IMAGENET_DIR=/path/to/pytorch/format/imagenet/directory/
+export WRITE_DIR=/your/path/here/
+./write_imagenet.sh "train" 500 0.50 90
+./write_imagenet.sh "val" 500 0.50 90
+```
+
+For training and evaluation simplicity, we extract embeddings before training (except backbone finetuning) and stack embeds together.
+
+```shell
+python pretrained_embeddings.py \
+	--train_data_ffcv  /path/to/train.ffcv \
+	--eval_data_ffcv    /path/to/val.ffcv \
+	--model_name "pre-trained visual backbone" 
+
+python stack_emb.py
+```
+
+### Training
+We train CSR/CSRv2 with `main_visual.py` and the detailed training instructions are available in [training instructions](/docs/training.md).
+```shell
+python main_visual.py \
+    --pretrained_emb ./CSR-precompute-embeds/FF2048_RN50_Embeds/1K_train_ff2048.npz \
+    --model_name resnet50d.ra4_e3600_r224_in1k \
+    --epochs 10 \
+    --initial_topk 64 \
+    --topk 32 \
+    --auxk 1024 \
+    --auxk_coef 0.03125 \
+    --cl_coef 0.1 \
+    --gpu 0 \
+    --model_suffix demo \
+    --use_label_CL 
+```
+
+### Evaluation
+Evaluation takes two steps: get embeddings for evaluation and compute evaluation results. Detailed instruction are available in [evaluation instructions](/docs/evaluation.md).
+```shell
+python chunk_npz_file.py \
+	--input_path "Path/to/original/embeddings" \
+	--output_path "Path/to/chunk/directory" \
+	--chunk_size "Number of samples per chunk"
+python csr_inference.py \
+    --train_emb_path  /path/to/train_emb \
+    --eval_emb_path    /path/to/val_emb \
+    --model_name "pre-trained visual backbone" \
+    --topk 8\
+    --hidden-size 8192 
+    --csr_ckpt "CSR ckpt path"
+
+python ./retrieval/faiss_nn.py --topk $TOPK
+python ./retrieval/compute_metrics.py --topk $TOPK  
+```
 
 ## Citing this paper
 If you find this work useful, please cite the accompanying paper:
@@ -254,4 +313,4 @@ If you find this work useful, please cite the accompanying paper:
 ```
 
 ## Acknowledgements
-This repository was built off of [CSR](https://github.com/neilwen987/CSR_Adaptive_Rep) and [GraphRAG-Benchmark](https://github.com/GraphRAG-Bench/GraphRAG-Benchmark). Thank you for their amazing works!
+This repository was built off of [CSR](https://github.com/neilwen987/CSR_Adaptive_Rep) and [GraphRAG-Benchmark](https://github.com/GraphRAG-Bench/GraphRAG-Benchmark). Thanks for their amazing works!
