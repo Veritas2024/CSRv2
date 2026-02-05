@@ -3,6 +3,7 @@
 <h1 style="font-family: Georgia; font-weight: 600; letter-spacing: 0.5px;">
 ✨ CSRv2: Unlocking Ultra-Sparse Embeddings ✨
 </h1>
+<h3>ICLR 2026</h3>
 
 <br>
 
@@ -21,9 +22,9 @@
 <p style="font-size: 14px; color: #555; margin-top: 8px;">
 <sup>1</sup>Stony Brook University &emsp; 
 <sup>2</sup>Xidian University &emsp;
-<sup>3</sup>MIT &emsp;
+<sup>3</sup>MIT CSAIL&emsp;
 <sup>4</sup>Yale University &emsp;
-<sup>5</sup>TUM
+<sup>5</sup>Technical University of Munich
 </p>
 
 <img src="./assets/overview.jpg" width="600" style="border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
@@ -49,8 +50,8 @@ In this repo, we will release (**updating**):
     - Splade Exp.
     - GraphRAG Exp.
 - Checkpoints
-    - Text Exp 
-    - Image Exp
+    - Text Exp. 
+    - Image Exp.
 
 ## Set up
 An empty conda environment with Python >= 3.11 is required and install packages according to `requirements.txt`.
